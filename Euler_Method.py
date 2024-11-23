@@ -5,17 +5,16 @@ import numpy as np
 from matplotlib import pyplot as plt
 from sympy import symbols,sympify,lambdify
 import math
+from matplotlib.figure import Figure
 from decimal import getcontext
 getcontext().prec=100
-    
-from matplotlib.figure import Figure
 
 # Interfaz Base
 app=tk.Tk()
+app.geometry("800x600")
+app.configure(background="#f1ede3")
 graph_frame = tk.Frame(app, width=1000, height=1000, bg="lightgrey")
-graph_frame.place(relx=0.43, rely=0.13)  # Ubicar el marco del gráfico
-# widget_frame = tk.Frame(app, width=400, height=300, bg="white")
-# widget_frame.place(relx=0.5, rely=0.6, anchor="n")  # Ubicar los otros widgets
+graph_frame.place(relx=0.43, rely=0.13)
 fig = Figure(figsize=(6, 4), dpi=140)
 ax = fig.add_subplot(111) 
 canvas = FigureCanvasTkAgg(fig, master=graph_frame)
@@ -24,6 +23,7 @@ canvas_widget.pack()
 toolbar = NavigationToolbar2Tk(canvas, graph_frame, pack_toolbar=False)
 toolbar.pack()
 toolbar.update()
+tk.Wm.wm_title(app, "Solucionador de Ecuaciones Diferenciales Ordinarias.")
 
 def set_ax():
     ax.set_title("Método de Euler.")
@@ -33,7 +33,6 @@ def set_ax():
 
 set_ax()
 
-# Campos
 dydx=tk.StringVar(app)
 x0=tk.StringVar(app)
 y0=tk.StringVar(app)
@@ -41,15 +40,6 @@ h=tk.StringVar(app)
 x_final=tk.StringVar(app)
 y_x_final=tk.StringVar(app)
 error=tk.StringVar(app)
-
-# Dimensiones
-app.geometry("800x600")
-
-# Color de fondo
-app.configure(background="#f1ede3")
-
-# Titulo
-tk.Wm.wm_title(app, "Solucionador de Ecuaciones Diferenciales Ordinarias.")
 
 # Parametros
 TipoFuente="Courier"
@@ -112,7 +102,7 @@ i6.place(relx=0.13, rely=0.55, relheight=rh, relwidth=rw)
 e7=tk.Label(app, text="Error:", font=(TipoFuente, SizeFuente), bg=ColorBg, justify="center")
 e7.pack()
 e7.place(relx=0.33, rely=0.9, relheight=0.05, relwidth=0.1)
-i7=tk.Entry(app, font=(TipoFuente, SizeFuente), bg=ColorE, fg="black", justify="center", textvariable=error, state="readonly")
+i7=tk.Entry(app, font=(TipoFuente, SizeFuente, 'bold'), bg=ColorE, fg="red", justify="center", textvariable=error, state="readonly")
 i7.pack()
 i7.place(relx=0.43, rely=0.9, relheight=rh, relwidth=0.52)
 
@@ -135,7 +125,7 @@ def euler_method(_x0, _y0, _h, _x_final, _f):
     _y0=float(_y0)
     _h=float(_h)
     _x_final=float(_x_final)
-    if _x0+10000*_h<_x_final:
+    if _x0+100000*_h<_x_final:
         error.set("!!Error: An unexpected error occurred. Please check your input and try again.")
         return [], []
     _x_values=[_x0]
@@ -176,7 +166,28 @@ def graficar():
     ax.clear()
     set_ax()
     ax.plot(x_values,y_values,color="gold")
-    canvas.draw()
+    # Generar campo de isoclinas
+    try:
+        x, y, e = symbols('x y e', real=True)
+        input_expr = dydx.get()
+        expr = sympify(input_expr)
+        f = lambdify((x, y, e), expr)
+        x_min, x_max = float(x0.get()), float(x_final.get())
+        y_min = min(y_values) - 1
+        y_max = max(y_values) + 1
+        x_vals = np.linspace(x_min, x_max, 20)
+        y_vals = np.linspace(y_min, y_max, 20)
+        X, Y = np.meshgrid(x_vals, y_vals)
+        U = 1 
+        V = f(X, Y, math.e)
+        N = np.sqrt(U**2 + V**2)
+        U /= N
+        V /= N
+        ax.quiver(X, Y, U, V, color="lightgrey", alpha=0.7, pivot="middle", scale=20, label="Campo de Isoclinas.")
+        ax.legend()
+        canvas.draw()
+    except:
+        error.set("!!Error: An unexpected error occurred. Please check your input and try again.")
 
 # Botones
 # Resolver
