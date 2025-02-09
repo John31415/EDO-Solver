@@ -1,7 +1,7 @@
 # EDO Solver
 
 <p align="center">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Euler_method.svg/512px-Euler_method.svg.png" alt="Método de Euler" width="400">
+  <img src="https://www.myartprints.co.uk/kunst/emanuel_handmann/Portraet-Mathematiker.jpg" alt="Leonhard Euler" width="300">
 </p>
 
 ## 🙂 ¡Bienvenido!
