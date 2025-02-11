@@ -8,6 +8,7 @@ import math
 from matplotlib.figure import Figure
 from decimal import getcontext
 from Euler_Method import euler_method
+from Cubic_Splines import cubic_splines
 getcontext().prec=100
 
 # Interfaz Base
@@ -145,14 +146,24 @@ def resolver():
         return
     y_x_final.set(y_values[-1])
 
-def graficar():
+def graficar(flag):
     error.set("")
     x_values, y_values=resolver_ecuacion(dydx.get(),x0.get(),y0.get(),h.get(),x_final.get())
     if len(y_values)==0:
         return
-    ax.clear()
-    set_ax()
-    ax.plot(x_values,y_values,color="gold")
+    if flag:
+        X_splines, Y_splines, band=cubic_splines(x_values, y_values)
+        if not band:
+            error.set("!!Error: An unexpected error occurred. Please check your input and try again.")
+            return
+        ax.clear()
+        set_ax()
+        ax.plot(X_splines,Y_splines,color="gold")
+        ax.scatter(x_values,y_values,color="black")
+    else:
+        ax.clear()
+        set_ax()
+        ax.plot(x_values,y_values,color="gold")
     # Generar campo de isoclinas
     try:
         x, y, e = symbols('x y e', real=True)
@@ -183,9 +194,14 @@ botonResolver.pack
 botonResolver.place(relx=0.165, rely=0.48, relheight=0.04, relwidth=0.08)
 
 # Graficar
-botonResolver=tk.Button(app, text="Graficar", font=(TipoFuente,SizeFuente), bg="#9d8f6d", fg="black", command=graficar)
+botonResolver=tk.Button(app, text="Graficar", font=(TipoFuente,SizeFuente), bg="#9d8f6d", fg="black", command=lambda: graficar(False))
 botonResolver.pack
 botonResolver.place(relx=0.165, rely=0.62, relheight=0.04, relwidth=0.08)
+
+# Interpolar
+botonResolver=tk.Button(app, text="Interpolar", font=(TipoFuente,SizeFuente), bg="#9d8f6d", fg="black", command=lambda: graficar(True))
+botonResolver.pack
+botonResolver.place(relx=0.165, rely=0.71, relheight=0.04, relwidth=0.08)
 
 # Limpiar
 botonResolver=tk.Button(app, text="Limpiar", font=(TipoFuente,SizeFuente), bg="#9d8f6d", fg="black", command=limpiar)
