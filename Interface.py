@@ -177,7 +177,7 @@ def graficar(flag):
         y_vals = np.linspace(y_min, y_max, 20)
         X, Y = np.meshgrid(x_vals, y_vals)
         U = 1 
-        V = f(X, Y, math.e)
+        V = np.copy(f(X, Y, math.e))
         N = np.sqrt(U**2 + V**2)
         U /= N
         V /= N
